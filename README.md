@@ -40,7 +40,7 @@ pip install GreenTrace
 
 **Using `uv`:**
 ```bash
-uv pip install GreenTrace
+uv add GreenTrace
 ```
 
 ---
