@@ -121,6 +121,49 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+## 3. Live Monitoring (for long-running tasks)
+
+If you have a long-running process, like a machine learning training job or a complex API task, you might want to check its carbon footprint *while it's still running*. `GreenTrace` makes this easy.
+
+1.  **Name your tracker:** When you start the tracker (using the decorator or context manager), give it a unique `name`.
+2.  **Get the active tracker:** From another thread or a different part of your code, use `EmissionsTracker.get_active_tracker('your_task_name')`.
+3.  **Fetch current data:** Call `get_current_data()` on the tracker instance.
+
+This is particularly useful for REST APIs where you could have one endpoint start a task and another endpoint check its status.
+
+**Example:**
+
+Imagine you have a long-running task and a separate function to monitor it.
+
+```python
+import time
+import threading
+from carbonpy import EmissionsTracker, track_emissions, TrackerNotRunningError
+
+# 1. Define and name the task to be tracked
+@track_emissions(interval_seconds=2, name="my_ml_job", silent=True)
+def long_running_ml_job():
+    print("Starting a long-running machine learning job...")
+    time.sleep(10)
+    print("ML job finished.")
+
+# 2. Create a separate function to monitor the task
+def monitor_job():
+    print("--- Monitoring started ---")
+    while True:
+        try:
+            tracker = EmissionsTracker.get_active_tracker("my_ml_job")
+            data = tracker.get_current_data()
+            emissions = data["summary"]["emissions_gco2eq"]
+            duration = data["summary"]["duration_seconds"]
+            print(f"Live status: {emissions:.4f} gCO₂eq over {duration:.2f} seconds.")
+            time.sleep(3)
+        except TrackerNotRunningError:
+            print("--- Monitoring finished (task completed) ---")
+            break
+
+```
+
 ---
 
 ## Reporting
@@ -157,7 +200,7 @@ def my_function():
 The `track_emissions` decorator and `EmissionsTracker` class accept several arguments:
 
 -   `region` (str): The two-letter country code (e.g., "US", "DE", "CN") to use for carbon intensity data. Defaults to a global average.
--   `interval_seconds` (int): How often to take a power measurement. Default is `5`.
+-   `interval_seconds` (float): How often to take a power measurement. Default is `5`.
 -   `output_file` (str): Path to save the report file. If not provided, prints to console.
 -   `output_format` (str): `console`, `json`, `csv`, `html`. If an `output_file` is provided, the format is inferred from the file extension, otherwise defaults to `console`.
 -   `csv_summary_only` (bool): If `True` and format is `csv`, only the summary row is saved.
