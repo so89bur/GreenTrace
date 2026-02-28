@@ -26,7 +26,7 @@ class EmissionsTracker:
         self,
         # TODO: add GPU
         hardware_monitors: Optional[List[HardwareMonitor]] = None,
-        interval_seconds: int = 5,
+        interval_seconds: float = 5,
         region: str = "DEFAULT",
         output_file: Optional[str] = None,
         output_format: str = "console",  # console, json, csv, html
@@ -35,9 +35,7 @@ class EmissionsTracker:
         name: str = "default",
         silent: bool = False,
     ):
-        self.hardware_monitors = hardware_monitors or [
-            CPUMonitor(max_measurements=max_measurements)
-        ]
+        self.hardware_monitors = hardware_monitors or [CPUMonitor()]
         self.interval = interval_seconds
         self.region = region
         self.output_file = output_file
@@ -63,10 +61,9 @@ class EmissionsTracker:
         """Performs a single power measurement for all devices."""
         for monitor in self.hardware_monitors:
             power = monitor.get_power_usage()
-            monitor.add_measurement(power)
-            self._process_latest_measurement(monitor, power)
+            self._process_latest_measurement(power)
 
-    def _process_latest_measurement(self, monitor: HardwareMonitor, power_watts: float):
+    def _process_latest_measurement(self, power_watts: float):
         """Processes the latest measurement and adds it to self.measurements."""
         timestamp = datetime.now()
         energy_kwh = (power_watts * self.interval) / (1000 * 3600)
@@ -83,7 +80,7 @@ class EmissionsTracker:
             }
         )
         # Apply the limit on the number of stored measurements
-        if self.max_measurements and len(self.measurements) > self.max_measurements + 1:
+        if self.max_measurements and len(self.measurements) > self.max_measurements:
             # Instead of just deleting, we accumulate the oldest measurement
             # into the next one to preserve the total energy count without
             # bloating the measurements list.

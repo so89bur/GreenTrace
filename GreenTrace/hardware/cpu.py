@@ -54,8 +54,8 @@ RAPL_DIR = "/sys/class/powercap/intel-rapl/"
 class CPUMonitor(HardwareMonitor):
     """Monitors CPU power consumption."""
 
-    def __init__(self, max_measurements: Optional[int] = None):
-        super().__init__(max_measurements=max_measurements)
+    def __init__(self):
+        super().__init__()
         self.tdp = 125.0  # Default value
         self.is_rapl_available = False
         self.rapl_energy_files = []
@@ -63,7 +63,6 @@ class CPUMonitor(HardwareMonitor):
         self._last_rapl_time = 0.0
 
     def start(self, silent: bool = False) -> None:
-        self._measurements = []
         self._detect_cpu_power_source(silent)
 
         if self.is_rapl_available:
