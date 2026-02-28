@@ -5,7 +5,7 @@ import asyncio
 import inspect
 import os
 from datetime import datetime
-from threading import Thread
+from threading import Thread, Event
 from functools import wraps
 from typing import List, Optional
 
@@ -49,6 +49,7 @@ class EmissionsTracker:
 
         self._is_running = False
         self._task: Optional[Thread or asyncio.Task] = None
+        self._stop_event: Optional[Event] = None  # For sync mode
         self.total_energy_kwh = 0.0
         self.measurements: List[dict] = []
         self.emissions_gco2eq = 0.0
@@ -88,16 +89,9 @@ class EmissionsTracker:
     def _sync_run(self):
         """Measurement loop for synchronous code (in a separate thread)."""
         self._measure()  # First measurement right at the start
-        # Instead of a long sleep, we check the running status more frequently.
-        # This allows the thread to exit quickly after the main task is complete.
-        wait_chunk = 0.1  # Check every 100ms
-        remaining_wait = self.interval
         while self._is_running:
-            time.sleep(min(wait_chunk, remaining_wait))
-            remaining_wait -= wait_chunk
-            if remaining_wait <= 0:
-                self._measure()
-                remaining_wait = self.interval
+            time.sleep(self.interval)
+            self._measure()
 
     async def _async_run(self):
         """Measurement loop for asynchronous code."""
@@ -114,6 +108,7 @@ class EmissionsTracker:
         for monitor in self.hardware_monitors:
             monitor.start(silent=self.silent)
 
+        self._stop_event = Event()
         self._task = Thread(target=self._sync_run)
         self._task.start()
         if not self.silent:
@@ -140,9 +135,10 @@ class EmissionsTracker:
         self._is_running = False
         self._end_time = datetime.now()
 
-        # Wait for the task to complete
         if isinstance(self._task, Thread):
-            self._task.join(timeout=self.interval)
+            # Signal the thread to stop and wait for it to finish.
+            self._stop_event.set()
+            self._task.join()
         elif isinstance(self._task, asyncio.Task):
             # In asynchronous mode, just cancel the task
             self._task.cancel()
