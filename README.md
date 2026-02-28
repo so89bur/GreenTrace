@@ -138,7 +138,7 @@ Imagine you have a long-running task and a separate function to monitor it.
 ```python
 import time
 import threading
-from carbonpy import EmissionsTracker, track_emissions, TrackerNotRunningError
+from GreenTrace import EmissionsTracker, track_emissions, TrackerNotRunningError
 
 # 1. Define and name the task to be tracked
 @track_emissions(interval_seconds=2, name="my_ml_job", silent=True)
@@ -176,8 +176,7 @@ The most visually impressive output is the HTML certificate. It's a single, self
 
 **Example (`async_report.html`):**
 
-!HTML Report Screenshot 
-*(This is a placeholder, you can replace the URL with a real screenshot of the generated `async_report.html`)*
+https://freeimage.host/i/qqq26qF
 
 To generate it, set the output file to have an `.html` extension:
 

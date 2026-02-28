@@ -112,7 +112,7 @@ class Reporter:
             else None
         )
         report_id = (
-            f"CP-PY-{(start_time.strftime('%Y%m%d-%H%M%S'))}" if start_time else "N/A"
+            f"GT-PY-{(start_time.strftime('%Y%m%d-%H%M%S'))}" if start_time else "N/A"
         )
         issue_date = datetime.now().strftime("%d.%m.%Y")
         duration_str = f"{summary.get('duration_seconds', 0):.2f} sec"
