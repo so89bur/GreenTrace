@@ -49,7 +49,7 @@ class EmissionsTracker:
 
         self._is_running = False
         self._task: Optional[Thread or asyncio.Task] = None
-        self._stop_event: Optional[Event] = None  # For sync mode
+        self._stop_event: Optional[Event] = None
         self.total_energy_kwh = 0.0
         self.measurements: List[dict] = []
         self.emissions_gco2eq = 0.0
@@ -88,9 +88,9 @@ class EmissionsTracker:
 
     def _sync_run(self):
         """Measurement loop for synchronous code (in a separate thread)."""
-        self._measure()  # First measurement right at the start
-        while self._is_running:
-            time.sleep(self.interval)
+        self._measure()
+        while not self._stop_event.wait(timeout=self.interval):
+            # This loop continues as long as the event is not set.
             self._measure()
 
     async def _async_run(self):
@@ -135,6 +135,7 @@ class EmissionsTracker:
         self._is_running = False
         self._end_time = datetime.now()
 
+        # Wait for the task to complete
         if isinstance(self._task, Thread):
             # Signal the thread to stop and wait for it to finish.
             self._stop_event.set()
