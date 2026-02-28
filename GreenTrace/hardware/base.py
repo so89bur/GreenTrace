@@ -1,4 +1,4 @@
-# carbon_py/hardware/base.py
+# GreenTrace/hardware/base.py
 
 from abc import ABC, abstractmethod
 from typing import List, Dict, Tuple, Optional

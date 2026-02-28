@@ -1,4 +1,4 @@
-# carbon_py/tracker.py
+# GreenTrace/tracker.py
 
 import time
 import asyncio

@@ -1,4 +1,4 @@
-# carbon_py/emissions.py
+# GreenTrace/emissions.py
 
 
 class CarbonIntensityProvider:

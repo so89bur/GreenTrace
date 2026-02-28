@@ -7,7 +7,7 @@ import threading
 # Add the project root directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from carbonPy.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
+from GreenTrace.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
 
 
 @track_emissions(interval=1, region="FR", name="long_task")

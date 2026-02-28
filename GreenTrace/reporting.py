@@ -1,4 +1,4 @@
-# carbon_py/reporting.py
+# GreenTrace/reporting.py
 import json
 import csv
 import os
@@ -37,7 +37,7 @@ class Reporter:
         if self.silent:
             return
         summary = self.data["summary"]
-        print("\n" + "=" * 30 + " CarbonPy Report " + "=" * 30)
+        print("\n" + "=" * 30 + " GreenTrace Report " + "=" * 30)
         print(f"Start Time: {summary.get('start_time', 'N/A')}")
         print(f"End Time: {summary.get('end_time', 'N/A')}")
         print(f"Duration: {summary.get('duration_seconds', 0):.2f} seconds")
@@ -142,7 +142,7 @@ class Reporter:
                 .card small {{ color: #6c757d; font-size: 12px; }}
                 .methodology {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; text-align: justify; }}
                 .footer {{ margin-top: 30px; text-align: center; font-size: 12px; color: #adb5bd; }}
-                .seal {{ position: absolute; bottom: 30px; right: 30px; width: 90px; height: 90px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23343a40"/><path d="M50,15 L61.8,38.2 L87.5,42.5 L68.8,60.8 L73.6,86 L50,73.8 L26.4,86 L31.2,60.8 L12.5,42.5 L38.2,38.2 Z" fill="%23e9ecef"/><text x="50" y="55" font-family="Arial" font-size="10" fill="%23343a40" text-anchor="middle" font-weight="bold">CarbonPy</text></svg>'); }}
+                .seal {{ position: absolute; bottom: 30px; right: 30px; width: 90px; height: 90px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23343a40"/><path d="M50,15 L61.8,38.2 L87.5,42.5 L68.8,60.8 L73.6,86 L50,73.8 L26.4,86 L31.2,60.8 L12.5,42.5 L38.2,38.2 Z" fill="%23e9ecef"/><text x="50" y="55" font-family="Arial" font-size="10" fill="%23343a40" text-anchor="middle" font-weight="bold">GreenTrace</text></svg>'); }}
             </style>
         </head>
         <body>
@@ -187,12 +187,12 @@ class Reporter:
                 <div class="methodology">
                     <h3>Methodology</h3>
                     <p>
-                        The emissions estimate was produced by the CarbonPy library. The calculation is based on measuring CPU power consumption. For Linux systems with Intel processors, Intel RAPL technology can be used for more accurate measurements. In other cases, a model based on Thermal Design Power (TDP) and current processor load is used. The resulting energy consumption is multiplied by the carbon intensity factor for the '{summary['region']}' region. The data is an estimate and is intended for comparative analysis.
+                        The emissions estimate was produced by the GreenTrace library. The calculation is based on measuring CPU power consumption. For Linux systems with Intel processors, Intel RAPL technology can be used for more accurate measurements. In other cases, a model based on Thermal Design Power (TDP) and current processor load is used. The resulting energy consumption is multiplied by the carbon intensity factor for the '{summary['region']}' region. The data is an estimate and is intended for comparative analysis.
                     </p>
                 </div>
 
                 <div class="footer">
-                    Generated with CarbonPy
+                    Generated with GreenTrace
                 </div>
 
                 <div class="seal"></div>

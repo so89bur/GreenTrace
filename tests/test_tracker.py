@@ -6,7 +6,7 @@ import csv
 
 import pytest
 
-from carbonPy.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
+from GreenTrace.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
 
 # Mark all tests in this file as async for pytest-asyncio
 pytestmark = pytest.mark.asyncio

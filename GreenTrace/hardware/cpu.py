@@ -1,4 +1,4 @@
-# carbon_py/hardware/cpu.py
+# GreenTrace/hardware/cpu.py
 
 import os
 import platform
