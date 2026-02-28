@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from GreenTrace.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
 
 
-@track_emissions(interval=1, region="FR", name="long_task")
+@track_emissions(interval_seconds=1, region="FR", name="long_task")
 def long_running_task():
     """A long-running task that we will monitor."""
     print("Starting long computations...")

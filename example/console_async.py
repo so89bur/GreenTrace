@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from GreenTrace.tracker import track_emissions
 
 
-@track_emissions(interval=1, region="DE", silent=False)
+@track_emissions(interval_seconds=1, region="DE", silent=False)
 async def async_process_data():
     print("Starting heavy computations...")
     # Simulate CPU work

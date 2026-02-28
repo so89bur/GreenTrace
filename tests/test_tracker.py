@@ -81,7 +81,7 @@ class TestTrackEmissionsDecorator:
         output_file = tmp_path / "sync_report.csv"
 
         @track_emissions(
-            interval=0.05, output_file=output_file, silent=True, region="FR"
+            interval_seconds=0.05, output_file=output_file, silent=True, region="FR"
         )
         def sync_task():
             # time.sleep() is correct here because the function itself is synchronous
@@ -100,7 +100,7 @@ class TestTrackEmissionsDecorator:
         output_file = tmp_path / "async_report.html"
 
         @track_emissions(
-            interval=0.05, output_file=output_file, silent=True, region="DE"
+            interval_seconds=0.05, output_file=output_file, silent=True, region="DE"
         )
         async def async_task():
             await asyncio.sleep(0.11)
@@ -117,7 +117,7 @@ class TestTrackEmissionsDecorator:
         output_file = tmp_path / "report.json"
 
         @track_emissions(
-            interval=0.01,
+            interval_seconds=0.01,
             output_file=output_file,
             output_strategy="timestamp",
             silent=True,
@@ -140,7 +140,7 @@ class TestMonitoring:
         """Test getting intermediate data from an active tracker."""
         tracker_name = "my_long_task"
 
-        @track_emissions(interval=0.05, name=tracker_name, silent=True)
+        @track_emissions(interval_seconds=0.05, name=tracker_name, silent=True)
         async def long_task():
             # Give the tracker time to start
             await asyncio.sleep(0.06)
@@ -168,7 +168,7 @@ class TestReporting:
         output_file = tmp_path / "summary.csv"
 
         @track_emissions(
-            interval=0.02,
+            interval_seconds=0.02,
             output_file=output_file,
             csv_summary_only=True,
             silent=True,

@@ -11,7 +11,7 @@ from GreenTrace.tracker import track_emissions
 
 
 @track_emissions(
-    interval=2,
+    interval_seconds=2,
     region="US",
     output_file="report.csv",
     csv_summary_only=True,

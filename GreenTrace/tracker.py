@@ -219,7 +219,7 @@ class EmissionsTracker:
 def track_emissions(
     func=None,
     *,
-    interval: int = 5,
+    interval_seconds: int = 5,
     region: str = "DEFAULT",
     output_file: Optional[str] = None,
     output_format: str = "console",
@@ -245,7 +245,7 @@ def track_emissions(
                 format = ext.lower().lstrip(".") if ext else "console"
 
             with EmissionsTracker(
-                interval_seconds=interval,
+                interval_seconds=interval_seconds,
                 region=region,
                 output_file=current_output_file,
                 output_format=format,
@@ -271,7 +271,7 @@ def track_emissions(
                 format = ext.lower().lstrip(".") if ext else "console"
 
             async with EmissionsTracker(
-                interval_seconds=interval,
+                interval_seconds=interval_seconds,
                 region=region,
                 output_file=current_output_file,
                 output_format=format,
