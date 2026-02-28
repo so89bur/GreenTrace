@@ -1,6 +1,6 @@
 [project]
 name = "GreenTrace"
-version = "0.1.9"
+version = "0.2.0"
 description = "Effortless CO₂ Emissions Tracking for Python Code"
 readme = "README.md"
 requires-python = ">=3.8"
