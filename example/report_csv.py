@@ -3,8 +3,8 @@ import os
 import time
 import asyncio
 
-# Добавляем корневую директорию проекта в sys.path
-# чтобы можно было импортировать carbon_py
+# Add the project root directory to sys.path
+# so that carbon_py can be imported
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from carbonPy.tracker import track_emissions
@@ -20,9 +20,9 @@ from carbonPy.tracker import track_emissions
     silent=False,
 )
 def short_sync_task():
-    print("\nЗапуск синхронной задачи для CSV отчета ...")
+    print("\nStarting sync task for CSV report...")
     time.sleep(20)
-    print("Синхронная задача завершена.")
+    print("Sync task finished.")
 
 
 short_sync_task()

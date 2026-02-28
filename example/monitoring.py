@@ -4,7 +4,7 @@ import time
 import asyncio
 import threading
 
-# Добавляем корневую директорию проекта в sys.path
+# Add the project root directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from carbonPy.tracker import EmissionsTracker, track_emissions, TrackerNotRunningError
@@ -12,37 +12,35 @@ from carbonPy.tracker import EmissionsTracker, track_emissions, TrackerNotRunnin
 
 @track_emissions(interval=1, region="FR", name="long_task")
 def long_running_task():
-    """Длительная задача, за которой мы будем наблюдать."""
-    print("Начинаем длительные вычисления...")
+    """A long-running task that we will monitor."""
+    print("Starting long computations...")
     time.sleep(15)
-    print("Длительные вычисления завершены.")
+    print("Long computations finished.")
 
 
 def monitor_task():
-    """Функция для мониторинга, запрашивает данные каждые 3 секунды."""
-    print("\n--- Мониторинг запущен ---")
+    """Monitoring function, requests data every 3 seconds."""
+    print("\n--- Monitoring started ---")
     while True:
         try:
-            # Получаем активный трекер по его имени
+            # Get the active tracker by its name
             tracker = EmissionsTracker.get_active_tracker("long_task")
             data = tracker.get_current_data()
             emissions = data["summary"]["emissions_gco2eq"]
             duration = data["summary"]["duration_seconds"]
-            print(
-                f"Промежуточный результат: {emissions:.4f} гCO₂экв за {duration:.2f} сек."
-            )
+            print(f"Intermediate result: {emissions:.4f} gCO₂eq in {duration:.2f} sec.")
             time.sleep(3)
         except TrackerNotRunningError:
-            print("--- Мониторинг завершен (трекер остановлен) ---\n")
+            print("--- Monitoring finished (tracker stopped) ---\n")
             break
 
 
-# Запускаем задачу для мониторинга в отдельном потоке
+# Run the monitoring task in a separate thread
 monitor_thread = threading.Thread(target=monitor_task)
 monitor_thread.start()
 
-# Запускаем основную длительную задачу
+# Run the main long-running task
 long_running_task()
 
-# Ожидаем завершения потока мониторинга
+# Wait for the monitoring thread to finish
 monitor_thread.join()

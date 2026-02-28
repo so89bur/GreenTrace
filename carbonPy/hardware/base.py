@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 class HardwareMonitor(ABC):
-    """Абстрактный базовый класс для мониторинга энергопотребления оборудования."""
+    """Abstract base class for monitoring hardware power consumption."""
 
     def __init__(self, max_measurements: Optional[int] = None):
         self._measurements: List[Tuple[datetime, float]] = []
@@ -14,24 +14,24 @@ class HardwareMonitor(ABC):
 
     @abstractmethod
     def start(self, silent: bool = False) -> None:
-        """Начать мониторинг."""
+        """Start monitoring."""
         pass
 
     @abstractmethod
     def stop(self, silent: bool = False) -> None:
-        """Остановить мониторинг."""
+        """Stop monitoring."""
         pass
 
     @abstractmethod
     def get_power_usage(self) -> float:
-        """Получить текущее энергопотребление в Ваттах."""
+        """Get the current power consumption in Watts."""
         pass
 
     def get_total_energy_kwh(self, interval_seconds: int) -> float:
         """
-        Рассчитывает общую потребленную энергию в кВт*ч.
+        Calculates the total energy consumed in kWh.
 
-        Формула: (средняя_мощность_ватт * общее_время_секунд) / (1000 * 3600)
+        Formula: (average_power_watts * total_seconds) / (1000 * 3600)
         """
         if not self._measurements:
             return 0.0
@@ -45,12 +45,12 @@ class HardwareMonitor(ABC):
         return kwh
 
     def add_measurement(self, power_watts: float):
-        """Добавляет измерение мощности с временной меткой."""
+        """Adds a power measurement with a timestamp."""
         self._measurements.append((datetime.now(), power_watts))
 
         if self.max_measurements and len(self._measurements) > self.max_measurements:
             self._measurements.pop(0)
 
     def get_metadata(self) -> Dict[str, str]:
-        """Возвращает метаданные об оборудовании."""
+        """Returns metadata about the hardware."""
         return {}

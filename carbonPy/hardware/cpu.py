@@ -10,8 +10,8 @@ import cpuinfo
 
 from .base import HardwareMonitor
 
-# Источник данных по TDP/Max Power:
-# Intel/AMD: Данные от производителей и бенчмарков.
+# Data source for TDP/Max Power:
+# Intel/AMD: Data from manufacturers and benchmarks.
 CPU_POWER_DATA: Dict[str, float] = {
     # Apple Silicon (Max Power, W)
     "Apple M1": 20.0,
@@ -52,11 +52,11 @@ RAPL_DIR = "/sys/class/powercap/intel-rapl/"
 
 
 class CPUMonitor(HardwareMonitor):
-    """Мониторинг энергопотребления CPU."""
+    """Monitors CPU power consumption."""
 
     def __init__(self, max_measurements: Optional[int] = None):
         super().__init__(max_measurements=max_measurements)
-        self.tdp = 125.0  # Значение по умолчанию
+        self.tdp = 125.0  # Default value
         self.is_rapl_available = False
         self.rapl_energy_files = []
         self._last_rapl_energy = 0.0
@@ -76,8 +76,8 @@ class CPUMonitor(HardwareMonitor):
                 print(f"CPU Monitor: Started using TDP model ({self.tdp}W).")
 
     def _detect_cpu_power_source(self, silent: bool):
-        """Определяет источник данных: RAPL или TDP."""
-        # 1. Проверка на Intel RAPL (только для Linux)
+        """Determines the data source: RAPL or TDP."""
+        # 1. Check for Intel RAPL (Linux only)
         if platform.system() == "Linux" and os.path.exists(RAPL_DIR):
             for root, _, files in os.walk(RAPL_DIR):
                 if "energy_uj" in files and "intel-rapl" in root:
@@ -103,7 +103,7 @@ class CPUMonitor(HardwareMonitor):
             )
 
     def _get_rapl_energy(self) -> float:
-        """Считывает суммарную энергию из всех найденных RAPL файлов."""
+        """Reads the total energy from all found RAPL files."""
         total_energy_uj = 0
         for file_path in self.rapl_energy_files:
             try:
@@ -114,26 +114,26 @@ class CPUMonitor(HardwareMonitor):
         return total_energy_uj
 
     def _get_power_from_rapl(self) -> float:
-        """Рассчитывает среднюю мощность за интервал времени через RAPL."""
+        """Calculates the average power over a time interval using RAPL."""
         current_energy = self._get_rapl_energy()
         current_time = time.time()
 
         time_delta = current_time - self._last_rapl_time
         energy_delta = current_energy - self._last_rapl_energy
 
-        # Обновляем значения для следующего вызова
+        # Update values for the next call
         self._last_rapl_energy = current_energy
         self._last_rapl_time = current_time
 
         if time_delta == 0:
             return 0.0
 
-        # Конвертируем из микро-джоулей в джоули и делим на секунды, чтобы получить Ватты
+        # Convert from microjoules to joules and divide by seconds to get Watts
         power_watts = (energy_delta / 1_000_000) / time_delta
         return power_watts if power_watts >= 0 else 0.0
 
     def _get_power_from_tdp(self) -> float:
-        """Оценивает энергопотребление на основе TDP и утилизации CPU."""
+        """Estimates power consumption based on TDP and CPU utilization."""
         cpu_utilization = psutil.cpu_percent() / 100.0
         power_watts = self.tdp * cpu_utilization
         return power_watts
@@ -143,7 +143,7 @@ class CPUMonitor(HardwareMonitor):
             print("CPU Monitor: Stopped")
 
     def get_power_usage(self) -> float:
-        """Возвращает текущее энергопотребление CPU в Ваттах."""
+        """Returns the current CPU power consumption in Watts."""
         if self.is_rapl_available:
             return self._get_power_from_rapl()
         else:

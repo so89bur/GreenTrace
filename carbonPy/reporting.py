@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 class Reporter:
     """
-    Класс для генерации отчетов в различных форматах (консоль, JSON, CSV).
+    A class for generating reports in various formats (console, JSON, CSV).
     """
 
     def __init__(
@@ -26,31 +26,31 @@ class Reporter:
         self.silent = silent
 
     def report(self):
-        """Главный метод, который вызывает нужный формат вывода."""
+        """The main method that calls the required output format."""
         if self.output_file:
             self._report_to_file()
         else:
             self.to_console()
 
     def to_console(self):
-        """Выводит отчет в консоль."""
+        """Prints the report to the console."""
         if self.silent:
             return
         summary = self.data["summary"]
         print("\n" + "=" * 30 + " CarbonPy Report " + "=" * 30)
         print(f"Start Time: {summary.get('start_time', 'N/A')}")
         print(f"End Time: {summary.get('end_time', 'N/A')}")
-        print(f"Duration: {summary.get('duration_seconds', 'N/A')} seconds")
-        print(f"Total Energy Consumed: {summary['total_energy_kwh']:.6f} кВт*ч")
+        print(f"Duration: {summary.get('duration_seconds', 0):.2f} seconds")
+        print(f"Total Energy Consumed: {summary['total_energy_kwh']:.6f} kWh")
         print(
-            f"Carbon Intensity ({summary['region']}): {summary['carbon_intensity_gco2_per_kwh']} гCO₂экв/кВт*ч"
+            f"Carbon Intensity ({summary['region']}): {summary['carbon_intensity_gco2_per_kwh']} gCO₂eq/kWh"
         )
-        print(f"Total CO₂ Emissions: {summary['emissions_gco2eq']:.4f} гCO₂экв")
+        print(f"Total CO₂ Emissions: {summary['emissions_gco2eq']:.4f} gCO₂eq")
         print(f"Number of measurements: {len(self.data['measurements'])}")
         print("=" * 80 + "\n")
 
     def _report_to_file(self):
-        """Вызывает метод для сохранения отчета в файл в зависимости от формата."""
+        """Calls the method to save the report to a file depending on the format."""
         if self.output_format == "json":
             self._to_json()
         elif self.output_format == "csv":
@@ -93,12 +93,12 @@ class Reporter:
 
     def _to_html(self):
         summary = self.data["summary"]
-        # Средние выбросы легкового автомобиля: ~120 гCO2/км.
-        # Источник: European Environment Agency
+        # Average car emissions: ~120 gCO2/km.
+        # Source: European Environment Agency
         car_emissions_per_km = 120
         equivalent_km = summary["emissions_gco2eq"] / car_emissions_per_km
 
-        # Средняя емкость аккумулятора смартфона ~15 Вт*ч = 0.015 кВт*ч
+        # Average smartphone battery capacity ~15 Wh = 0.015 kWh
         smartphone_charge_kwh = 0.015
         equivalent_charges = (
             summary["total_energy_kwh"] / smartphone_charge_kwh
@@ -115,17 +115,17 @@ class Reporter:
             f"CP-PY-{(start_time.strftime('%Y%m%d-%H%M%S'))}" if start_time else "N/A"
         )
         issue_date = datetime.now().strftime("%d.%m.%Y")
-        duration_str = f"{summary.get('duration_seconds', 0):.2f} сек"
+        duration_str = f"{summary.get('duration_seconds', 0):.2f} sec"
         start_time_str = (
             start_time.strftime("%d.%m.%Y %H:%M:%S") if start_time else "N/A"
         )
 
         html_content = f"""
         <!DOCTYPE html>
-        <html lang="ru">
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>Сертификат Углеродного Следа</title>
+            <title>Carbon Footprint Certificate</title>
             <style>
                 body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 40px; background-color: #e9ecef; color: #343a40; }}
                 .certificate {{ max-width: 800px; margin: auto; background: white; padding: 40px; border: 10px solid #343a40; box-shadow: 0 0 20px rgba(0,0,0,0.15); position: relative; }}
@@ -148,51 +148,51 @@ class Reporter:
         <body>
             <div class="certificate">
                 <div class="header">
-                    <h1>Сертификат Углеродного Следа</h1>
-                    <p>ID отчета: {report_id}  |  Дата выдачи: {issue_date}</p>
+                    <h1>Carbon Footprint Certificate</h1>
+                    <p>Report ID: {report_id}  |  Issue Date: {issue_date}</p>
                 </div>
 
                 <div class="main-results">
-                    <h2>Итоговые выбросы CO₂</h2>
-                    <p class="value">{summary['emissions_gco2eq']:.4f} гCO₂экв</p>
+                    <h2>Total CO₂ Emissions</h2>
+                    <p class="value">{summary['emissions_gco2eq']:.4f} gCO₂eq</p>
                 </div>
 
                 <div class="details-grid">
                     <div class="card">
-                        <h3>Общее энергопотребление</h3>
-                        <p>{summary['total_energy_kwh']:.6f} кВт*ч</p>
+                        <h3>Total Energy Consumption</h3>
+                        <p>{summary['total_energy_kwh']:.6f} kWh</p>
                     </div>
                     <div class="card">
-                        <h3>Продолжительность анализа</h3>
+                        <h3>Analysis Duration</h3>
                         <p>{duration_str}</p>
-                        <small>Начало: {start_time_str}</small>
+                        <small>Start: {start_time_str}</small>
                     </div>
                 </div>
 
                 <div class="details-grid">
                     <div class="card">
-                        <h3>Интенсивность выбросов ({summary['region']})</h3>
-                        <p>{summary['carbon_intensity_gco2_per_kwh']} г/кВт*ч</p>
-                        <small>Количество CO₂, выбрасываемого при генерации 1 кВт*ч энергии в данном регионе.</small>
+                        <h3>Carbon Intensity ({summary['region']})</h3>
+                        <p>{summary['carbon_intensity_gco2_per_kwh']} g/kWh</p>
+                        <small>Amount of CO₂ emitted per 1 kWh of energy generated in this region.</small>
                     </div>
                      <div class="card">
-                        <h3>Эквиваленты</h3>
-                        <p>~{equivalent_km:.2f} км</p>
-                        <small>пробега легкового автомобиля</small>
+                        <h3>Equivalents</h3>
+                        <p>~{equivalent_km:.2f} km</p>
+                        <small>of a passenger car journey</small>
                         <p style="margin-top: 10px;">~{equivalent_charges:.0f}</p>
-                        <small>полных зарядок смартфона</small>
+                        <small>full smartphone charges</small>
                     </div>
                 </div>
 
                 <div class="methodology">
-                    <h3>Методология</h3>
+                    <h3>Methodology</h3>
                     <p>
-                        Оценка выбросов произведена библиотекой CarbonPy. Расчет основан на измерении энергопотребления CPU. Для систем Linux с процессорами Intel может использоваться технология Intel RAPL для более точных измерений. В остальных случаях используется модель на основе Thermal Design Power (TDP) и текущей загрузки процессора. Полученное энергопотребление умножается на коэффициент углеродной интенсивности для региона '{summary['region']}'. Данные являются оценочными и предназначены для сравнительного анализа.
+                        The emissions estimate was produced by the CarbonPy library. The calculation is based on measuring CPU power consumption. For Linux systems with Intel processors, Intel RAPL technology can be used for more accurate measurements. In other cases, a model based on Thermal Design Power (TDP) and current processor load is used. The resulting energy consumption is multiplied by the carbon intensity factor for the '{summary['region']}' region. The data is an estimate and is intended for comparative analysis.
                     </p>
                 </div>
 
                 <div class="footer">
-                    Сгенерировано с помощью CarbonPy
+                    Generated with CarbonPy
                 </div>
 
                 <div class="seal"></div>

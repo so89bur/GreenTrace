@@ -3,59 +3,59 @@
 
 class CarbonIntensityProvider:
     """
-    Предоставляет данные об интенсивности выбросов углерода (гCO₂экв/кВт*ч).
+    Provides carbon intensity data (gCO₂eq/kWh).
     """
 
-    # Источник: IEA – International Energy Agency. Данные за 2025 год.
-    # Данные представляют собой граммы эквивалента CO2 на киловатт-час (гCO₂экв/кВт*ч).
+    # Source: IEA – International Energy Agency. Data for 2025.
+    # Data represents grams of CO2 equivalent per kilowatt-hour (gCO₂eq/kWh).
     _INTENSITY_DATA = {
-        # Европа
-        "DE": 380,  # Германия (снижение, но уголь еще сохраняет долю)
-        "GB": 145,  # Великобритания (активный вывод угля из эксплуатации)
-        "FR": 55,  # Франция (традиционно низкая за счет АЭС)
-        "IT": 290,  # Италия
-        "ES": 140,  # Испания (высокая доля солнечной генерации)
-        "PL": 650,  # Польша (постепенный отход от угля, значительное снижение)
-        "NL": 310,  # Нидерланды
-        "SE": 12,  # Швеция (почти полная декарбонизация)
-        "NO": 10,  # Норвегия
-        "FI": 50,  # Финляндия
-        "DK": 85,  # Дания
-        "RU": 335,  # Россия (стабильно, небольшой рост доли газа)
-        "CH": 25,  # Швейцария
-        "AT": 80,  # Австрия
-        "BE": 135,  # Бельгия
-        "IE": 310,  # Ирландия
-        "PT": 150,  # Португалия
-        "GR": 265,  # Греция (достигнут исторический минимум в 2025)
-        # Америка
-        "US": 355,  # США (умеренное снижение, рост газа ограничивает падение)
-        "CA": 105,  # Канада
-        "BR": 85,  # Бразилия (высокая доля гидроэнергетики)
-        "MX": 410,  # Мексика
-        "AR": 260,  # Аргентина
-        "CL": 145,  # Чили
-        "CO": 90,  # Колумбия
-        # Азия и Океания
-        "CN": 525,  # Китай (заметное снижение благодаря рекордному вводу ВИЭ)
-        "IN": 680,  # Индия (интенсивность падает, несмотря на рост абсолютных выбросов)
-        "JP": 440,  # Япония
-        "AU": 480,  # Австралия (быстрое внедрение солнечных панелей)
-        "KR": 395,  # Южная Корея
-        "ID": 740,  # Индонезия
-        "VN": 450,  # Вьетнам
-        "TH": 420,  # Таиланд
-        "MY": 560,  # Малайзия
-        "PK": 480,  # Пакистан
-        "NZ": 85,  # Новая Зеландия
-        # Другие регионы
-        "ZA": 810,  # Южная Африка (остается одной из самых высоких в мире)
-        "TR": 430,  # Турция
-        "DEFAULT": 425,  # Среднемировое значение (прогноз IEA на 2025: ~415-430)
+        # Europe
+        "DE": 380,  # Germany (declining, but coal still retains a share)
+        "GB": 145,  # Great Britain (active decommissioning of coal)
+        "FR": 55,  # France (traditionally low due to nuclear power)
+        "IT": 290,  # Italy
+        "ES": 140,  # Spain (high share of solar generation)
+        "PL": 650,  # Poland (gradual move away from coal, significant reduction)
+        "NL": 310,  # Netherlands
+        "SE": 12,  # Sweden (almost complete decarbonization)
+        "NO": 10,  # Norway
+        "FI": 50,  # Finland
+        "DK": 85,  # Denmark
+        "RU": 335,  # Russia (stable, slight increase in the share of gas)
+        "CH": 25,  # Switzerland
+        "AT": 80,  # Austria
+        "BE": 135,  # Belgium
+        "IE": 310,  # Ireland
+        "PT": 150,  # Portugal
+        "GR": 265,  # Greece (reached a historic low in 2025)
+        # America
+        "US": 355,  # USA (moderate decline, gas growth limits the fall)
+        "CA": 105,  # Canada
+        "BR": 85,  # Brazil (high share of hydropower)
+        "MX": 410,  # Mexico
+        "AR": 260,  # Argentina
+        "CL": 145,  # Chile
+        "CO": 90,  # Colombia
+        # Asia and Oceania
+        "CN": 525,  # China (noticeable reduction due to record commissioning of renewables)
+        "IN": 680,  # India (intensity is falling, despite the growth in absolute emissions)
+        "JP": 440,  # Japan
+        "AU": 480,  # Australia (rapid adoption of solar panels)
+        "KR": 395,  # South Korea
+        "ID": 740,  # Indonesia
+        "VN": 450,  # Vietnam
+        "TH": 420,  # Thailand
+        "MY": 560,  # Malaysia
+        "PK": 480,  # Pakistan
+        "NZ": 85,  # New Zealand
+        # Other regions
+        "ZA": 810,  # South Africa (remains one of the highest in the world)
+        "TR": 430,  # Turkey
+        "DEFAULT": 425,  # Global average (IEA forecast for 2025: ~415-430)
     }
 
     def get_intensity(self, region_code: str) -> int:
-        """Возвращает интенсивность для региона или значение по умолчанию."""
+        """Returns the intensity for a region or the default value."""
         return self._INTENSITY_DATA.get(
             region_code.upper(), self._INTENSITY_DATA["DEFAULT"]
         )

@@ -20,13 +20,11 @@ class TrackerNotRunningError(Exception):
 
 
 class EmissionsTracker:
-    """
-    Основной класс для отслеживания выбросов.
-    Работает как в синхронном, так и в асинхронном режиме.
-    """
+    """Main class for tracking emissions. Works in both synchronous and asynchronous modes."""
 
     def __init__(
         self,
+        # TODO: add GPU
         hardware_monitors: Optional[List[HardwareMonitor]] = None,
         interval_seconds: int = 5,
         region: str = "DEFAULT",
@@ -62,14 +60,14 @@ class EmissionsTracker:
     _active_trackers: "dict[str, EmissionsTracker]" = {}
 
     def _measure(self):
-        """Выполняет одно измерение мощности для всех устройств."""
+        """Performs a single power measurement for all devices."""
         for monitor in self.hardware_monitors:
             power = monitor.get_power_usage()
             monitor.add_measurement(power)
             self._process_latest_measurement(monitor, power)
 
     def _process_latest_measurement(self, monitor: HardwareMonitor, power_watts: float):
-        """Обрабатывает последнее измерение и добавляет его в self.measurements."""
+        """Processes the latest measurement and adds it to self.measurements."""
         timestamp = datetime.now()
         energy_kwh = (power_watts * self.interval) / (1000 * 3600)
         self.total_energy_kwh += energy_kwh
@@ -84,26 +82,26 @@ class EmissionsTracker:
                 "emissions_gco2eq": round(emissions_gco2eq, 6),
             }
         )
-        # Применяем ограничение на количество хранимых измерений
+        # Apply the limit on the number of stored measurements
         if self.max_measurements and len(self.measurements) > self.max_measurements:
             self.measurements.pop(0)
 
     def _sync_run(self):
-        """Цикл измерений для синхронного кода (в отдельном потоке)."""
-        self._measure()  # Первый замер сразу при старте
+        """Measurement loop for synchronous code (in a separate thread)."""
+        self._measure()  # First measurement right at the start
         while self._is_running:
             time.sleep(self.interval)
             self._measure()
 
     async def _async_run(self):
-        """Цикл измерений для асинхронного кода."""
-        self._measure()  # Первый замер сразу при старте
+        """Measurement loop for asynchronous code."""
+        self._measure()  # First measurement right at the start
         while self._is_running:
             await asyncio.sleep(self.interval)
             self._measure()
 
     def start(self):
-        """Запускает трекер."""
+        """Starts the tracker."""
         EmissionsTracker._active_trackers[self.name] = self
         self._start_time = datetime.now()
         self._is_running = True
@@ -116,7 +114,7 @@ class EmissionsTracker:
             print("Tracker: Running in SYNC mode (background thread).")
 
     def astart(self):
-        """Запускает ASYNC трекер."""
+        """Starts the ASYNC tracker."""
         EmissionsTracker._active_trackers[self.name] = self
         self._start_time = datetime.now()
         self._is_running = True
@@ -129,18 +127,18 @@ class EmissionsTracker:
             print("Tracker: Running in ASYNC mode.")
 
     def stop(self):
-        """Останавливает трекер и вычисляет результаты."""
+        """Stops the tracker and calculates the results."""
         if not self._is_running:
             return
 
         self._is_running = False
         self._end_time = datetime.now()
 
-        # Ожидаем завершения задачи
+        # Wait for the task to complete
         if isinstance(self._task, Thread):
             self._task.join(timeout=self.interval)
         elif isinstance(self._task, asyncio.Task):
-            # В асинхронном режиме просто отменяем задачу
+            # In asynchronous mode, just cancel the task
             self._task.cancel()
 
         for monitor in self.hardware_monitors:
@@ -161,12 +159,12 @@ class EmissionsTracker:
         reporter.report()
 
     def get_current_data(self) -> dict:
-        """Возвращает текущие накопленные данные."""
+        """Returns the current accumulated data."""
         if not self._is_running and not self._end_time:
-            # Трекер еще не был запущен
+            # Tracker has not been started yet
             end_time = None
         else:
-            # Трекер запущен или уже остановлен
+            # Tracker is running or has been stopped
             end_time = self._end_time or datetime.now()
 
         duration_seconds = 0
@@ -192,11 +190,11 @@ class EmissionsTracker:
 
     @classmethod
     def get_active_tracker(cls, name: str = "default") -> "EmissionsTracker":
-        """Возвращает активный экземпляр трекера по имени."""
+        """Returns the active tracker instance by name."""
         tracker = cls._active_trackers.get(name)
         if not tracker:
             raise TrackerNotRunningError(
-                f"Трекер с именем '{name}' не найден или не запущен."
+                f"Tracker with name '{name}' not found or not running."
             )
         return tracker
 
@@ -208,16 +206,16 @@ class EmissionsTracker:
         self.stop()
 
     async def __aenter__(self):
-        """Асинхронный вход в контекстный менеджер."""
+        """Asynchronous entry into the context manager."""
         self.astart()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Асинхронный выход из контекстного менеджера."""
+        """Asynchronous exit from the context manager."""
         self.stop()
 
 
-# --- Декоратор ---
+# --- Decorator ---
 def track_emissions(
     func=None,
     *,
@@ -282,7 +280,7 @@ def track_emissions(
                 name=name,
                 silent=silent,
             ):
-                # В асинхронном режиме трекер сам определит это и запустит asyncio.Task
+                # In async mode, the tracker will detect this and start an asyncio.Task
                 result = await fn(*args, **kwargs)
             return result
 
