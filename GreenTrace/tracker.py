@@ -35,7 +35,6 @@ class EmissionsTracker:
         name: str = "default",
         silent: bool = False,
     ):
-        print(output_file, output_format)
         self.hardware_monitors = hardware_monitors or [
             CPUMonitor(max_measurements=max_measurements)
         ]
@@ -89,9 +88,16 @@ class EmissionsTracker:
     def _sync_run(self):
         """Measurement loop for synchronous code (in a separate thread)."""
         self._measure()  # First measurement right at the start
+        # Instead of a long sleep, we check the running status more frequently.
+        # This allows the thread to exit quickly after the main task is complete.
+        wait_chunk = 0.1  # Check every 100ms
+        remaining_wait = self.interval
         while self._is_running:
-            time.sleep(self.interval)
-            self._measure()
+            time.sleep(min(wait_chunk, remaining_wait))
+            remaining_wait -= wait_chunk
+            if remaining_wait <= 0:
+                self._measure()
+                remaining_wait = self.interval
 
     async def _async_run(self):
         """Measurement loop for asynchronous code."""
