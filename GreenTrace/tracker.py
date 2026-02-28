@@ -31,7 +31,7 @@ class EmissionsTracker:
         output_file: Optional[str] = None,
         output_format: str = "console",  # console, json, csv, html
         csv_summary_only: bool = False,
-        max_measurements: Optional[int] = None,
+        max_measurements: Optional[int] = 1000,
         name: str = "default",
         silent: bool = False,
     ):
@@ -83,8 +83,16 @@ class EmissionsTracker:
             }
         )
         # Apply the limit on the number of stored measurements
-        if self.max_measurements and len(self.measurements) > self.max_measurements:
-            self.measurements.pop(0)
+        if self.max_measurements and len(self.measurements) > self.max_measurements + 1:
+            # Instead of just deleting, we accumulate the oldest measurement
+            # into the next one to preserve the total energy count without
+            # bloating the measurements list.
+            oldest = self.measurements.pop(0)
+            aggregated_measurement = self.measurements[0]
+            aggregated_measurement["duration_seconds"] += oldest["duration_seconds"]
+            aggregated_measurement["energy_kwh"] += oldest["energy_kwh"]
+            aggregated_measurement["emissions_gco2eq"] += oldest["emissions_gco2eq"]
+            # Power is not summed as it's an instantaneous value.
 
     def _sync_run(self):
         """Measurement loop for synchronous code (in a separate thread)."""
@@ -227,7 +235,7 @@ def track_emissions(
     output_file: Optional[str] = None,
     output_format: str = "console",
     csv_summary_only: bool = False,
-    max_measurements: Optional[int] = None,
+    max_measurements: Optional[int] = 1000,
     output_strategy: str = "overwrite",  # overwrite, timestamp
     name: str = "default",
     silent: bool = False,
